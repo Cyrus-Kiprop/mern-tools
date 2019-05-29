@@ -59,32 +59,56 @@ var IssueRow = function (_React$Component2) {
         React.createElement(
           "td",
           { style: borderedStyle },
-          this.props.issue_title,
-          this.props.child
+          this.props.issue_status
+        ),
+        React.createElement(
+          "td",
+          { style: borderedStyle },
+          this.props.issue_owner
+        ),
+        React.createElement(
+          "td",
+          { style: borderedStyle },
+          this.props.issue_created.toDateString()
+        ),
+        React.createElement(
+          "td",
+          { style: borderedStyle },
+          this.props.issue_effort
+        ),
+        React.createElement(
+          "td",
+          { style: borderedStyle },
+          this.props.issue_completion_date ? this.props.issue_completion_date.toDateString() : ""
+        ),
+        React.createElement(
+          "td",
+          { style: borderedStyle },
+          this.props.issue_title
         )
       );
     }
-    //   using the getter funcitons to come up with prop validation
+    // using the getter funcitons to come up with prop validation
 
-    //   static get propTypes() {
-    //     return {
-    //       issue_id: React.PropTypes.number.isRequired,
-    //       issue_title: React.PropTypes.string
-    //     };
-    //   }
-
+  }], [{
+    key: "propTypes",
+    get: function get() {
+      return {
+        issue_id: React.PropTypes.number.isRequired,
+        issue_title: React.PropTypes.string
+      };
+    }
   }]);
 
   return IssueRow;
 }(React.Component);
 // issue row validation
-
-
-IssueRow.propTypes = {
-  issue_id: React.PropTypes.number.isRequired,
-  issue_title: React.PropTypes.string
-};
+// IssueRow.propTypes = {
+//   issue_id: React.PropTypes.number.isRequired,
+//   issue_title: React.PropTypes.string
+// };
 //  or you can decide to declare inside the class definition
+
 
 var IssueTable = function (_React$Component3) {
   _inherits(IssueTable, _React$Component3);
@@ -98,10 +122,23 @@ var IssueTable = function (_React$Component3) {
   _createClass(IssueTable, [{
     key: "render",
     value: function render() {
+      var testFile = this.props.testFile;
+      var row_data = testFile.map(function (values, index) {
+        return React.createElement(IssueRow, {
+          key: values.id,
+          issue_id: values.id,
+          issue_title: values.title,
+          issue_owner: values.owner,
+          issue_created: values.created,
+          issue_effort: values.effort,
+          issue_completion_date: values.completionDate,
+          issue_status: values.status
+        });
+      });
       var borderedStyle = { border: "1px solid silver", padding: 6 };
       return React.createElement(
         "table",
-        { style: { borderCollapse: "collapse" } },
+        { border: "1", style: { borderCollapse: "collapse" } },
         React.createElement(
           "thead",
           null,
@@ -116,6 +153,31 @@ var IssueTable = function (_React$Component3) {
             React.createElement(
               "th",
               { style: borderedStyle },
+              "Status"
+            ),
+            React.createElement(
+              "th",
+              { style: borderedStyle },
+              "owner"
+            ),
+            React.createElement(
+              "th",
+              { style: borderedStyle },
+              "Created"
+            ),
+            React.createElement(
+              "th",
+              { style: borderedStyle },
+              "Effort"
+            ),
+            React.createElement(
+              "th",
+              { style: borderedStyle },
+              "Completion Date"
+            ),
+            React.createElement(
+              "th",
+              { style: borderedStyle },
               "Title"
             )
           )
@@ -123,14 +185,7 @@ var IssueTable = function (_React$Component3) {
         React.createElement(
           "tbody",
           null,
-          React.createElement(
-            IssueRow,
-            {
-              issue_id: 1,
-              issue_title: "Error in console when clicking Add"
-            },
-            "this my dental formula "
-          )
+          row_data
         )
       );
     }
@@ -174,6 +229,7 @@ var IssueList = function (_React$Component5) {
   _createClass(IssueList, [{
     key: "render",
     value: function render() {
+      var dataFile = this.props.data;
       return React.createElement(
         "div",
         null,
@@ -184,7 +240,7 @@ var IssueList = function (_React$Component5) {
         ),
         React.createElement(IssueFilter, null),
         React.createElement("hr", null),
-        React.createElement(IssueTable, null),
+        React.createElement(IssueTable, { testFile: dataFile }),
         React.createElement("hr", null),
         React.createElement(IssueAdd, null)
       );
@@ -194,4 +250,24 @@ var IssueList = function (_React$Component5) {
   return IssueList;
 }(React.Component);
 
-ReactDOM.render(React.createElement(IssueList, null), contentNode); // Render the component inside the content Node
+// this is the mock data will be used in the creation of adynamic components
+// this is an array of objects
+
+var issues = [{
+  id: 1,
+  status: "Open",
+  owner: "Ravan",
+  created: new Date("2016-08-15"),
+  effort: 5,
+  completionDate: undefined,
+  title: "Error in console when clicking Add"
+}, {
+  id: 2,
+  status: "Assigned",
+  owner: "Eddie",
+  created: new Date("2016-08-16"),
+  effort: 14,
+  completionDate: new Date("2016-08-30"),
+  title: "Missing bottom border on panel"
+}];
+ReactDOM.render(React.createElement(IssueList, { data: issues }), contentNode); // Render the component inside the content Node
