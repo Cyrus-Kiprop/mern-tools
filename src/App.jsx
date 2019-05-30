@@ -26,18 +26,18 @@ class IssueRow extends React.Component {
   }
   // using the getter funcitons to come up with prop validation
 
-  static get propTypes() {
-    return {
-      issue_id: React.PropTypes.number.isRequired,
-      issue_title: React.PropTypes.string
-    };
-  }
+  //   static get propTypes() {
+  //     return {
+  //       issue_id: React.PropTypes.number.isRequired,
+  //       issue_title: React.PropTypes.string
+  //     };
+  //   }
 }
 // issue row validation
-// IssueRow.propTypes = {
-//   issue_id: React.PropTypes.number.isRequired,
-//   issue_title: React.PropTypes.string
-// };
+IssueRow.propTypes = {
+  issue_id: React.PropTypes.number.isRequired,
+  issue_title: React.PropTypes.string
+};
 //  or you can decide to declare inside the class definition
 class IssueTable extends React.Component {
   render() {
@@ -45,7 +45,7 @@ class IssueTable extends React.Component {
     const row_data = testFile.map((values, index) => {
       return (
         <IssueRow
-          key={values.id}
+          key={index}
           issue_id={values.id}
           issue_title={values.title}
           issue_owner={values.owner}
@@ -58,7 +58,7 @@ class IssueTable extends React.Component {
     });
     const borderedStyle = { border: "1px solid silver", padding: 6 };
     return (
-      <table border="1" style={{ borderCollapse: "collapse" }}>
+      <table style={{ borderCollapse: "collapse" }}>
         <thead>
           <tr>
             <th style={borderedStyle}>Id</th>
@@ -81,7 +81,54 @@ class IssueAdd extends React.Component {
     return <div>This is a placeholder for an Issue Add entry form.</div>;
   }
 }
+// Asynchronous state initialiation in react
 class IssueList extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      issues: [] // initialising the issue stater with an emty array which will later be populated using ajax calls
+    };
+    this.createTestIssue = this.createTestIssue.bind(this);
+    setTimeout(this.createTestIssue, 3000);
+  }
+  // createIssue(newIssue) {
+  //   const original_issue = this.state.issues; // this preserves the original state of the issues array
+  //   const newIssues = this.state.issues.slice(); // this one create a new  array
+  //   newIssue.id = original_issue.length + 1;
+  //   newIssues.push(newIssue);
+  //   this.setState({
+  //     issues: [...original_issue, Object.assign({}, { newIssues })]
+  //   });
+  // }
+  createIssue(newIssue) {
+    const newIssues = this.state.issues.slice(); // makes a copy of the initial array
+    newIssue.id = this.state.issues.length + 1;
+    newIssues.push(newIssue);
+    this.setState({ issues: newIssues });
+  }
+  componentDidMount() {
+    this.loadData();
+  }
+  loadData() {
+    setTimeout(() => {
+      this.setState({
+        issues: issues
+      }),
+        500;
+    });
+  }
+  // this function invokes the createIssue function
+  createTestIssue() {
+    this.createIssue({
+      status: "New",
+      owner: "Pieta",
+      title: "Completion date should be optional",
+      status: "Open",
+      created: new Date("2016-08-15"),
+      effort: 5,
+      completionDate: undefined
+    });
+  }
   render() {
     const dataFile = this.props.data;
     return (
@@ -89,7 +136,8 @@ class IssueList extends React.Component {
         <h1>Issue Tracker</h1>
         <IssueFilter />
         <hr />
-        <IssueTable testFile={dataFile} />
+        <IssueTable testFile={this.state.issues} />
+        <button onClick={this.createTestIssue}>Add</button>
         <hr />
         <IssueAdd />
       </div>
