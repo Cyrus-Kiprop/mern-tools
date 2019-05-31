@@ -5,80 +5,104 @@ class IssueFilter extends React.Component {
   }
 }
 // buliding and optimising props in react
-class IssueRow extends React.Component {
-  render() {
-    const borderedStyle = { border: "1px solid silver", padding: 4 };
-    return (
-      <tr>
-        <td style={borderedStyle}>{this.props.issue_id}</td>
-        <td style={borderedStyle}>{this.props.issue_status}</td>
-        <td style={borderedStyle}>{this.props.issue_owner}</td>
-        <td style={borderedStyle}>{this.props.issue_created.toDateString()}</td>
-        <td style={borderedStyle}>{this.props.issue_effort}</td>
-        <td style={borderedStyle}>
-          {this.props.issue_completion_date
-            ? this.props.issue_completion_date.toDateString()
-            : ""}
-        </td>
-        <td style={borderedStyle}>{this.props.issue_title}</td>
-      </tr>
-    );
-  }
-  // using the getter funcitons to come up with prop validation
-
-  //   static get propTypes() {
-  //     return {
-  //       issue_id: React.PropTypes.number.isRequired,
-  //       issue_title: React.PropTypes.string
-  //     };
-  //   }
+function IssueRow(props) {
+  const borderedStyle = { border: "1px solid silver", padding: 4 };
+  return (
+    <tr>
+      <td style={borderedStyle}>{props.issue_id}</td>
+      <td style={borderedStyle}>{props.issue_status}</td>
+      <td style={borderedStyle}>{props.issue_owner}</td>
+      <td style={borderedStyle}>{props.issue_created.toDateString()}</td>
+      <td style={borderedStyle}>{props.issue_effort}</td>
+      <td style={borderedStyle}>
+        {props.issue_completion_date
+          ? props.issue_completion_date.toDateString()
+          : ""}
+      </td>
+      <td style={borderedStyle}>{props.issue_title}</td>
+    </tr>
+  );
 }
+// using the getter funcitons to come up with prop validation
+
+//   static get propTypes() {
+//     return {
+//       issue_id: React.PropTypes.number.isRequired,
+//       issue_title: React.PropTypes.string
+//     };
+//   }
+
 // issue row validation
 IssueRow.propTypes = {
   issue_id: React.PropTypes.number.isRequired,
   issue_title: React.PropTypes.string
 };
 //  or you can decide to declare inside the class definition
-class IssueTable extends React.Component {
-  render() {
-    const testFile = this.props.testFile;
-    const row_data = testFile.map((values, index) => {
-      return (
-        <IssueRow
-          key={index}
-          issue_id={values.id}
-          issue_title={values.title}
-          issue_owner={values.owner}
-          issue_created={values.created}
-          issue_effort={values.effort}
-          issue_completion_date={values.completionDate}
-          issue_status={values.status}
-        />
-      );
-    });
-    const borderedStyle = { border: "1px solid silver", padding: 6 };
+
+// stateless components
+function IssueTable(props) {
+  const testFile = props.testFile;
+  const row_data = testFile.map((values, index) => {
     return (
-      <table style={{ borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th style={borderedStyle}>Id</th>
-            <th style={borderedStyle}>Status</th>
-            <th style={borderedStyle}>owner</th>
-            <th style={borderedStyle}>Created</th>
-            <th style={borderedStyle}>Effort</th>
-            <th style={borderedStyle}>Completion Date</th>
-            <th style={borderedStyle}>Title</th>
-          </tr>
-        </thead>
-        <tbody>{row_data}</tbody>
-      </table>
+      <IssueRow
+        key={index}
+        issue_id={values.id}
+        issue_title={values.title}
+        issue_owner={values.owner}
+        issue_created={values.created}
+        issue_effort={values.effort}
+        issue_completion_date={values.completionDate}
+        issue_status={values.status}
+      />
     );
-  }
+  });
+  const borderedStyle = { border: "1px solid silver", padding: 6 };
+
+  return (
+    <table style={{ borderCollapse: "collapse" }}>
+      <thead>
+        <tr>
+          <th style={borderedStyle}>Id</th>
+          <th style={borderedStyle}>Status</th>
+          <th style={borderedStyle}>owner</th>
+          <th style={borderedStyle}>Created</th>
+          <th style={borderedStyle}>Effort</th>
+          <th style={borderedStyle}>Completion Date</th>
+          <th style={borderedStyle}>Title</th>
+        </tr>
+      </thead>
+      <tbody>{row_data}</tbody>
+    </table>
+  );
 }
 
 class IssueAdd extends React.Component {
+  constructor() {
+    super();
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+  handleSubmit(event) {
+    event.preventDefault();
+    var form = document.forms.issueAdd;
+    this.props.createIssue({
+      owner: form.owner.value,
+      title: form.title.value,
+      status: "New",
+      created: new Date()
+    });
+    form.owner.value = "";
+    form.title.value = "";
+  }
   render() {
-    return <div>This is a placeholder for an Issue Add entry form.</div>;
+    return (
+      <div>
+        <form name="issueAdd" onSubmit={this.handleSubmit}>
+          <input type="text" name="owner" placeholder="Owner" />
+          <input type="text" name="title" placeholder="Title" />
+          <button>Add</button>
+        </form>
+      </div>
+    );
   }
 }
 // Asynchronous state initialiation in react
@@ -88,8 +112,10 @@ class IssueList extends React.Component {
     this.state = {
       issues: [] // initialising the issue stater with an emty array which will later be populated using ajax calls
     };
+    //
     this.createTestIssue = this.createTestIssue.bind(this);
-    setTimeout(this.createTestIssue, 3000);
+    this.createIssue = this.createIssue.bind(this);
+    // setTimeout(this.createTestIssue, 3000);
   }
   // createIssue(newIssue) {
   //   const original_issue = this.state.issues; // this preserves the original state of the issues array
@@ -107,16 +133,16 @@ class IssueList extends React.Component {
     this.setState({ issues: newIssues });
   }
   componentDidMount() {
-    this.loadData();
+    setTimeout(() => this.createTestIssue(), 1000);
   }
-  loadData() {
-    setTimeout(() => {
-      this.setState({
-        issues: issues
-      }),
-        500;
-    });
-  }
+  // loadData() {
+  //   setTimeout(() => {
+  //     this.setState({
+  //       issues: issues
+  //     }),
+  //       1000;
+  //   });
+  // }
   // this function invokes the createIssue function
   createTestIssue() {
     this.createIssue({
@@ -139,7 +165,7 @@ class IssueList extends React.Component {
         <IssueTable testFile={this.state.issues} />
         <button onClick={this.createTestIssue}>Add</button>
         <hr />
-        <IssueAdd />
+        <IssueAdd createIssue={this.createIssue} />
       </div>
     );
   }
