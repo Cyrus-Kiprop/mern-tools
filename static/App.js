@@ -232,6 +232,7 @@ var IssueList = function (_React$Component3) {
     //
     _this3.createTestIssue = _this3.createTestIssue.bind(_this3);
     _this3.createIssue = _this3.createIssue.bind(_this3);
+    _this3.loadData = _this3.loadData.bind(_this3);
     // setTimeout(this.createTestIssue, 3000);
     return _this3;
   }
@@ -244,25 +245,56 @@ var IssueList = function (_React$Component3) {
   //     issues: [...original_issue, Object.assign({}, { newIssues })]
   //   });
   // }
-
+  // implementing testIssue using the fetch apis
 
   _createClass(IssueList, [{
     key: "createIssue",
     value: function createIssue(newIssue) {
-      var newIssues = this.state.issues.slice(); // makes a copy of the initial array
-      newIssue.id = this.state.issues.length + 1;
-      newIssues.push(newIssue);
-      this.setState({ issues: newIssues });
+      var _this4 = this;
+
+      fetch("api/issues", {
+        method: postMessage,
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: newIssue
+      }).then(function (response) {
+        return response.json(response);
+      }) // this is the parsed data by body parser by the json object
+      .then(function (updatedIssue) {
+        updatedIssue.created = new Date();
+        if (updateIssue.completionDate) {
+          new Date(updatedIssue.completionDate);
+        }
+        // this avoids mutability of the state
+        var newIssues = _this4.states.issues.concat(updatedIssue);
+        _this4.setState({
+          issues: newIssues
+        });
+      })
+      // handles any error that occurs in the fetch apis
+      .catch(function (err) {
+        return alert("ERROR insending data to the server " + err.stack);
+      });
     }
+
+    // createIssue(newIssue) {
+    //   const newIssues = this.state.issues.slice(); // makes a copy of the initial array
+    //   newIssue.id = this.state.issues.length + 1;
+    //   newIssues.push(newIssue);
+    //   this.setState({ issues: newIssues });
+    // }
+
   }, {
     key: "componentDidMount",
     value: function componentDidMount() {
-      var _this4 = this;
+      var _this5 = this;
 
       setTimeout(function () {
-        return _this4.createTestIssue();
+        return _this5.loadData();
       }, 1000);
     }
+    // implementing this using the fetch apis
     // loadData() {
     //   setTimeout(() => {
     //     this.setState({
@@ -271,6 +303,25 @@ var IssueList = function (_React$Component3) {
     //       1000;
     //   });
     // }
+
+  }, {
+    key: "loadData",
+    value: function loadData() {
+      var _this6 = this;
+
+      fetch("/api/issues").then(function (response) {
+        return response.json();
+      }).then(function (data) {
+        console.log("Total count of records:", data._metadata.total_count);
+        data.records.forEach(function (issue) {
+          issue.created = new Date(issue.created);
+          if (issue.completionDate) issue.completionDate = new Date(issue.completionDate);
+        });
+        _this6.setState({ issues: data.records });
+      }).catch(function (err) {
+        console.log(err);
+      });
+    }
     // this function invokes the createIssue function
 
   }, {
@@ -316,21 +367,26 @@ var IssueList = function (_React$Component3) {
 // this is the mock data will be used in the creation of adynamic components
 // this is an array of objects
 
-var issues = [{
-  id: 1,
-  status: "Open",
-  owner: "Ravan",
-  created: new Date("2016-08-15"),
-  effort: 5,
-  completionDate: undefined,
-  title: "Error in console when clicking Add"
-}, {
-  id: 2,
-  status: "Assigned",
-  owner: "Eddie",
-  created: new Date("2016-08-16"),
-  effort: 14,
-  completionDate: new Date("2016-08-30"),
-  title: "Missing bottom border on panel"
-}];
-ReactDOM.render(React.createElement(IssueList, { data: issues }), contentNode); // Render the component inside the content Node
+// const issues = [
+//   {
+//     id: 1,
+//     status: "Open",
+//     owner: "Ravan",
+//     created: new Date("2016-08-15"),
+//     effort: 5,
+//     completionDate: undefined,
+//     title: "Error in console when clicking Add"
+//   },
+//   {
+//     id: 2,
+//     status: "Assigned",
+//     owner: "Eddie",
+//     created: new Date("2016-08-16"),
+//     effort: 14,
+//     completionDate: new Date("2016-08-30"),
+//     title: "Missing bottom border on panel"
+//   }
+// ];
+
+
+ReactDOM.render(React.createElement(IssueList, null), contentNode); // Render the component inside the content Node

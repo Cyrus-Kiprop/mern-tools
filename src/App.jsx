@@ -115,6 +115,7 @@ class IssueList extends React.Component {
     //
     this.createTestIssue = this.createTestIssue.bind(this);
     this.createIssue = this.createIssue.bind(this);
+    this.loadData = this.loadData.bind(this);
     // setTimeout(this.createTestIssue, 3000);
   }
   // createIssue(newIssue) {
@@ -126,15 +127,42 @@ class IssueList extends React.Component {
   //     issues: [...original_issue, Object.assign({}, { newIssues })]
   //   });
   // }
+  // implementing testIssue using the fetch apis
+
   createIssue(newIssue) {
-    const newIssues = this.state.issues.slice(); // makes a copy of the initial array
-    newIssue.id = this.state.issues.length + 1;
-    newIssues.push(newIssue);
-    this.setState({ issues: newIssues });
+    fetch("api/issues", {
+      method: postMessage,
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: newIssue
+    })
+      .then(response => response.json(response)) // this is the parsed data by body parser by the json object
+      .then(updatedIssue => {
+        updatedIssue.created = new Date();
+        if (updateIssue.completionDate) {
+          new Date(updatedIssue.completionDate);
+        }
+        // this avoids mutability of the state
+        const newIssues = this.states.issues.concat(updatedIssue);
+        this.setState({
+          issues: newIssues
+        });
+      })
+      // handles any error that occurs in the fetch apis
+      .catch(err => alert(`ERROR insending data to the server ${err.stack}`));
   }
+
+  // createIssue(newIssue) {
+  //   const newIssues = this.state.issues.slice(); // makes a copy of the initial array
+  //   newIssue.id = this.state.issues.length + 1;
+  //   newIssues.push(newIssue);
+  //   this.setState({ issues: newIssues });
+  // }
   componentDidMount() {
-    setTimeout(() => this.createTestIssue(), 1000);
+    setTimeout(() => this.loadData(), 1000);
   }
+  // implementing this using the fetch apis
   // loadData() {
   //   setTimeout(() => {
   //     this.setState({
@@ -143,6 +171,22 @@ class IssueList extends React.Component {
   //       1000;
   //   });
   // }
+  loadData() {
+    fetch("/api/issues")
+      .then(response => response.json())
+      .then(data => {
+        console.log("Total count of records:", data._metadata.total_count);
+        data.records.forEach(issue => {
+          issue.created = new Date(issue.created);
+          if (issue.completionDate)
+            issue.completionDate = new Date(issue.completionDate);
+        });
+        this.setState({ issues: data.records });
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
   // this function invokes the createIssue function
   createTestIssue() {
     this.createIssue({
@@ -174,24 +218,24 @@ class IssueList extends React.Component {
 // this is the mock data will be used in the creation of adynamic components
 // this is an array of objects
 
-const issues = [
-  {
-    id: 1,
-    status: "Open",
-    owner: "Ravan",
-    created: new Date("2016-08-15"),
-    effort: 5,
-    completionDate: undefined,
-    title: "Error in console when clicking Add"
-  },
-  {
-    id: 2,
-    status: "Assigned",
-    owner: "Eddie",
-    created: new Date("2016-08-16"),
-    effort: 14,
-    completionDate: new Date("2016-08-30"),
-    title: "Missing bottom border on panel"
-  }
-];
-ReactDOM.render(<IssueList data={issues} />, contentNode); // Render the component inside the content Node
+// const issues = [
+//   {
+//     id: 1,
+//     status: "Open",
+//     owner: "Ravan",
+//     created: new Date("2016-08-15"),
+//     effort: 5,
+//     completionDate: undefined,
+//     title: "Error in console when clicking Add"
+//   },
+//   {
+//     id: 2,
+//     status: "Assigned",
+//     owner: "Eddie",
+//     created: new Date("2016-08-16"),
+//     effort: 14,
+//     completionDate: new Date("2016-08-30"),
+//     title: "Missing bottom border on panel"
+//   }
+// ];
+ReactDOM.render(<IssueList />, contentNode); // Render the component inside the content Node
