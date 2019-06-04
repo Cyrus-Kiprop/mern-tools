@@ -1,79 +1,52 @@
 const contentNode = document.getElementById("contents");
+
+class IssueRow extends React.Component {
+  render() {
+    const issue = this.props.issue;
+    return (
+      <tr>
+        <td>{issue.id}</td>
+        <td>{issue.status}</td>
+        <td>{issue.owner}</td>
+        <td>{issue.created.toDateString()}</td>
+        <td>{issue.effort}</td>
+        <td>
+          {issue.completionDate ? issue.completionDate.toDateString() : ""}
+        </td>
+        <td>{issue.title}</td>
+      </tr>
+    );
+  }
+}
+
+class IssueTable extends React.Component {
+  render() {
+    const issueRows = this.props.issues.map(issue => (
+      <IssueRow key={issue.id} issue={issue} />
+    ));
+    return (
+      <table className="bordered-table">
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Status</th>
+            <th>Owner</th>
+            <th>Created</th>
+            <th>Effort</th>
+            <th>Completion Date</th>
+            <th>Title</th>
+          </tr>
+        </thead>
+        <tbody>{issueRows}</tbody>
+      </table>
+    );
+  }
+}
+
 class IssueFilter extends React.Component {
   render() {
     return <div>This is a placeholder for the Issue Filter.</div>;
   }
-}
-// buliding and optimising props in react
-function IssueRow(props) {
-  const borderedStyle = { border: "1px solid silver", padding: 4 };
-  return (
-    <tr>
-      <td style={borderedStyle}>{props.issue_id}</td>
-      <td style={borderedStyle}>{props.issue_status}</td>
-      <td style={borderedStyle}>{props.issue_owner}</td>
-      <td style={borderedStyle}>
-        {props.issue_created ? props.issue_created : ""}
-      </td>
-      <td style={borderedStyle}>{props.issue_effort}</td>
-      <td style={borderedStyle}>
-        {props.issue_completion_date ? props.issue_completion_date : ""}
-      </td>
-      <td style={borderedStyle}>{props.issue_title}</td>
-    </tr>
-  );
-}
-// using the getter funcitons to come up with prop validation
-
-//   static get propTypes() {
-//     return {
-//       issue_id: React.PropTypes.number.isRequired,
-//       issue_title: React.PropTypes.string
-//     };
-//   }
-
-// issue row validation
-IssueRow.propTypes = {
-  issue_id: React.PropTypes.number.isRequired,
-  issue_title: React.PropTypes.string
-};
-//  or you can decide to declare inside the class definition
-
-// stateless components
-function IssueTable(props) {
-  const testFile = props.testFile;
-  const row_data = testFile.map((values, index) => {
-    return (
-      <IssueRow
-        key={index}
-        issue_id={values.id}
-        issue_title={values.title}
-        issue_owner={values.owner}
-        issue_created={values.created}
-        issue_effort={values.effort}
-        issue_completion_date={values.completionDate}
-        issue_status={values.status}
-      />
-    );
-  });
-  const borderedStyle = { border: "1px solid silver", padding: 6 };
-
-  return (
-    <table style={{ borderCollapse: "collapse" }}>
-      <thead>
-        <tr>
-          <th style={borderedStyle}>Id</th>
-          <th style={borderedStyle}>Status</th>
-          <th style={borderedStyle}>owner</th>
-          <th style={borderedStyle}>Created</th>
-          <th style={borderedStyle}>Effort</th>
-          <th style={borderedStyle}>Completion Date</th>
-          <th style={borderedStyle}>Title</th>
-        </tr>
-      </thead>
-      <tbody>{row_data}</tbody>
-    </table>
-  );
 }
 
 class IssueAdd extends React.Component {
@@ -81,8 +54,8 @@ class IssueAdd extends React.Component {
     super();
     this.handleSubmit = this.handleSubmit.bind(this);
   }
-  handleSubmit(event) {
-    event.preventDefault();
+  handleSubmit(e) {
+    e.preventDefault();
     var form = document.forms.issueAdd;
     this.props.createIssue({
       owner: form.owner.value,
@@ -90,6 +63,7 @@ class IssueAdd extends React.Component {
       status: "New",
       created: new Date()
     });
+    // clear the form for the next input
     form.owner.value = "";
     form.title.value = "";
   }
@@ -105,99 +79,17 @@ class IssueAdd extends React.Component {
     );
   }
 }
-// Asynchronous state initialiation in react
+
 class IssueList extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      issues: [] // initialising the issue stater with an emty array which will later be populated using ajax calls
-    };
-    //
-    this.createTestIssue = this.createTestIssue.bind(this);
+  constructor() {
+    super();
+    this.state = { issues: [] };
     this.createIssue = this.createIssue.bind(this);
-    this.loadData = this.loadData.bind(this);
-    // setTimeout(this.createTestIssue, 3000);
-  }
-  createIssue(newIssue) {
-    const original_issue = this.state.issues; // this preserves the original state of the issues array
-    const newIssues = this.state.issues.slice(); // this one create a new  array
-    newIssue.id = original_issue.length + 1;
-    newIssues.push(newIssue);
-    this.setState({
-      issues: [...original_issue, Object.assign({}, { newIssues })]
-    });
-  }
-  // implementing testIssue using the fetch apis
-
-  // client side error handling
-  createIssue(newIssue) {
-    fetch("/api/issues", {
-      header: { "Content-Type": "application/json" },
-      method: "POST",
-      body: JSON.stringify(newIssue)
-    }).then(response => {
-      if (response.ok) {
-        response.json().then(updatedIssue => {
-          updatedIssue.created = new Date(updatedIssue.created);
-          // the completion date in this validation is optionall so its imporatnt to check for its existence
-          if (updatedIssue.completionDate) {
-            updatedIssue.completionDate = new Date(completionDate);
-          }
-          // avoid immutability of the current state
-          const newIssue = this.state.issues.concat(updatedIssue);
-          // this update the state with a new issue
-          this.setState({ issues: newIssue });
-        });
-      } else {
-        response.json().then(error => {
-          alert(`failed to add issue ${error.stack}`);
-        });
-      }
-    });
   }
 
-  // createIssue(newIssue) {
-  //   fetch("api/issues", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json"
-  //     },
-  //     body: JSON.stringify(newIssue)
-  //   })
-  //     .then(response => response.json()) // this is the parsed data by body parser by the json object
-  //     .then(updatedIssue => {
-  //       updatedIssue.created = new Date();
-  //       if (updatedIssue.completionDate) {
-  //         updatedIssue.completionDate = new Date(updatedIssue.completionDate);
-  //       }
-  //       // this avoids mutability of the state
-  //       const newIssues = this.state.issues.concat(updatedIssue);
-  //       this.setState({
-  //         issues: newIssues
-  //       });
-  //     })
-  //     // handles any error that occurs in the fetch apis
-  //     .catch(err => alert(`ERROR insending data to the server ${err.stack}`));
-  // }
-
-  // createIssue(newIssue) {
-  //   const newIssues = this.state.issues.slice(); // makes a copy of the initial array
-  //   newIssue.id = this.state.issues.length + 1;
-  //   newIssues.push(newIssue);
-  //   this.setState({ issues: newIssues });
-  // }
   componentDidMount() {
-    setTimeout(() => this.loadData(), 1000);
+    this.loadData();
   }
-  // implementing this using the fetch apis
-  // loadData() {
-  //   setTimeout(() => {
-  //     this.setState({
-  //       issues: issues
-  //     }),
-  //       1000;
-  //   });
-  // }
   loadData() {
     fetch("/api/issues")
       .then(response => response.json())
@@ -214,55 +106,50 @@ class IssueList extends React.Component {
         console.log(err);
       });
   }
-  // this function invokes the createIssue function
-  createTestIssue() {
-    this.createIssue({
-      status: "New",
-      owner: "Pieta",
-      title: "Completion date should be optional",
-      status: "Open",
-      created: new Date("2016-08-15"),
-      effort: 5,
-      completionDate: undefined
-    });
+  createIssue(newIssue) {
+    fetch("/api/issues", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newIssue)
+    })
+      .then(response => {
+        if (response.ok) {
+          response.json().then(updatedIssue => {
+            updatedIssue.created = new Date(updatedIssue.created);
+            if (updatedIssue.completionDate)
+              updatedIssue.completionDate = new Date(
+                updatedIssue.completionDate
+              );
+            const newIssues = this.state.issues.concat(updatedIssue);
+            this.setState({ issues: newIssues });
+          });
+        } else {
+          response.json().then(error => {
+            alert("Failed to add issue: " + error.message);
+          });
+        }
+      })
+      .catch(err => {
+        alert("Error in sending data to server: " + err.message);
+      });
   }
+  // createTestIssue() {
+  //     this.createIssue({
+  //         status: 'New', owner: 'Pato', created: new Date(),
+  //         title: 'El Chapo',
+  //     });
+  // }
   render() {
-    const dataFile = this.props.data;
     return (
       <div>
         <h1>Issue Tracker</h1>
         <IssueFilter />
         <hr />
-        <IssueTable testFile={this.state.issues} />
-        <button onClick={this.createTestIssue}>Add</button>
+        <IssueTable issues={this.state.issues} />
         <hr />
         <IssueAdd createIssue={this.createIssue} />
       </div>
     );
   }
 }
-
-// this is the mock data will be used in the creation of adynamic components
-// this is an array of objects
-
-// const issues = [
-//   {
-//     id: 1,
-//     status: "Open",
-//     owner: "Ravan",
-//     created: new Date("2016-08-15"),
-//     effort: 5,
-//     completionDate: undefined,
-//     title: "Error in console when clicking Add"
-//   },
-//   {
-//     id: 2,
-//     status: "Assigned",
-//     owner: "Eddie",
-//     created: new Date("2016-08-16"),
-//     effort: 14,
-//     completionDate: new Date("2016-08-30"),
-//     title: "Missing bottom border on panel"
-//   }
-// ];
-ReactDOM.render(<IssueList />, contentNode); // Render the component inside the content Node
+ReactDOM.render(<IssueList />, contentNode);
