@@ -4,6 +4,8 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -60,7 +62,7 @@ function IssueRow(props) {
     React.createElement(
       "td",
       { style: borderedStyle },
-      props.issue_created.toDateString()
+      props.issue_created ? props.issue_created : ""
     ),
     React.createElement(
       "td",
@@ -70,7 +72,7 @@ function IssueRow(props) {
     React.createElement(
       "td",
       { style: borderedStyle },
-      props.issue_completion_date ? props.issue_completion_date.toDateString() : ""
+      props.issue_completion_date ? props.issue_completion_date : ""
     ),
     React.createElement(
       "td",
@@ -236,47 +238,75 @@ var IssueList = function (_React$Component3) {
     // setTimeout(this.createTestIssue, 3000);
     return _this3;
   }
-  // createIssue(newIssue) {
-  //   const original_issue = this.state.issues; // this preserves the original state of the issues array
-  //   const newIssues = this.state.issues.slice(); // this one create a new  array
-  //   newIssue.id = original_issue.length + 1;
-  //   newIssues.push(newIssue);
-  //   this.setState({
-  //     issues: [...original_issue, Object.assign({}, { newIssues })]
-  //   });
-  // }
-  // implementing testIssue using the fetch apis
 
   _createClass(IssueList, [{
     key: "createIssue",
     value: function createIssue(newIssue) {
-      var _this4 = this;
-
-      fetch("api/issues", {
-        method: postMessage,
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: newIssue
-      }).then(function (response) {
-        return response.json(response);
-      }) // this is the parsed data by body parser by the json object
-      .then(function (updatedIssue) {
-        updatedIssue.created = new Date();
-        if (updateIssue.completionDate) {
-          new Date(updatedIssue.completionDate);
-        }
-        // this avoids mutability of the state
-        var newIssues = _this4.states.issues.concat(updatedIssue);
-        _this4.setState({
-          issues: newIssues
-        });
-      })
-      // handles any error that occurs in the fetch apis
-      .catch(function (err) {
-        return alert("ERROR insending data to the server " + err.stack);
+      var original_issue = this.state.issues; // this preserves the original state of the issues array
+      var newIssues = this.state.issues.slice(); // this one create a new  array
+      newIssue.id = original_issue.length + 1;
+      newIssues.push(newIssue);
+      this.setState({
+        issues: [].concat(_toConsumableArray(original_issue), [Object.assign({}, { newIssues: newIssues })])
       });
     }
+    // implementing testIssue using the fetch apis
+
+    // client side error handling
+
+  }, {
+    key: "createIssue",
+    value: function createIssue(newIssue) {
+      var _this4 = this;
+
+      fetch("/api/issues", {
+        header: { "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify(newIssue)
+      }).then(function (response) {
+        if (response.ok) {
+          response.json().then(function (updatedIssue) {
+            updatedIssue.created = new Date(updatedIssue.created);
+            // the completion date in this validation is optionall so its imporatnt to check for its existence
+            if (updatedIssue.completionDate) {
+              updatedIssue.completionDate = new Date(completionDate);
+            }
+            // avoid immutability of the current state
+            var newIssue = _this4.state.issues.concat(updatedIssue);
+            // this update the state with a new issue
+            _this4.setState({ issues: newIssue });
+          });
+        } else {
+          response.json().then(function (error) {
+            alert("failed to add issue " + error.stack);
+          });
+        }
+      });
+    }
+
+    // createIssue(newIssue) {
+    //   fetch("api/issues", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json"
+    //     },
+    //     body: JSON.stringify(newIssue)
+    //   })
+    //     .then(response => response.json()) // this is the parsed data by body parser by the json object
+    //     .then(updatedIssue => {
+    //       updatedIssue.created = new Date();
+    //       if (updatedIssue.completionDate) {
+    //         updatedIssue.completionDate = new Date(updatedIssue.completionDate);
+    //       }
+    //       // this avoids mutability of the state
+    //       const newIssues = this.state.issues.concat(updatedIssue);
+    //       this.setState({
+    //         issues: newIssues
+    //       });
+    //     })
+    //     // handles any error that occurs in the fetch apis
+    //     .catch(err => alert(`ERROR insending data to the server ${err.stack}`));
+    // }
 
     // createIssue(newIssue) {
     //   const newIssues = this.state.issues.slice(); // makes a copy of the initial array

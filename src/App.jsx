@@ -12,12 +12,12 @@ function IssueRow(props) {
       <td style={borderedStyle}>{props.issue_id}</td>
       <td style={borderedStyle}>{props.issue_status}</td>
       <td style={borderedStyle}>{props.issue_owner}</td>
-      <td style={borderedStyle}>{props.issue_created.toDateString()}</td>
+      <td style={borderedStyle}>
+        {props.issue_created ? props.issue_created : ""}
+      </td>
       <td style={borderedStyle}>{props.issue_effort}</td>
       <td style={borderedStyle}>
-        {props.issue_completion_date
-          ? props.issue_completion_date.toDateString()
-          : ""}
+        {props.issue_completion_date ? props.issue_completion_date : ""}
       </td>
       <td style={borderedStyle}>{props.issue_title}</td>
     </tr>
@@ -118,40 +118,67 @@ class IssueList extends React.Component {
     this.loadData = this.loadData.bind(this);
     // setTimeout(this.createTestIssue, 3000);
   }
-  // createIssue(newIssue) {
-  //   const original_issue = this.state.issues; // this preserves the original state of the issues array
-  //   const newIssues = this.state.issues.slice(); // this one create a new  array
-  //   newIssue.id = original_issue.length + 1;
-  //   newIssues.push(newIssue);
-  //   this.setState({
-  //     issues: [...original_issue, Object.assign({}, { newIssues })]
-  //   });
-  // }
+  createIssue(newIssue) {
+    const original_issue = this.state.issues; // this preserves the original state of the issues array
+    const newIssues = this.state.issues.slice(); // this one create a new  array
+    newIssue.id = original_issue.length + 1;
+    newIssues.push(newIssue);
+    this.setState({
+      issues: [...original_issue, Object.assign({}, { newIssues })]
+    });
+  }
   // implementing testIssue using the fetch apis
 
+  // client side error handling
   createIssue(newIssue) {
-    fetch("api/issues", {
-      method: postMessage,
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: newIssue
-    })
-      .then(response => response.json(response)) // this is the parsed data by body parser by the json object
-      .then(updatedIssue => {
-        updatedIssue.created = new Date();
-        if (updateIssue.completionDate) {
-          new Date(updatedIssue.completionDate);
-        }
-        // this avoids mutability of the state
-        const newIssues = this.states.issues.concat(updatedIssue);
-        this.setState({
-          issues: newIssues
+    fetch("/api/issues", {
+      header: { "Content-Type": "application/json" },
+      method: "POST",
+      body: JSON.stringify(newIssue)
+    }).then(response => {
+      if (response.ok) {
+        response.json().then(updatedIssue => {
+          updatedIssue.created = new Date(updatedIssue.created);
+          // the completion date in this validation is optionall so its imporatnt to check for its existence
+          if (updatedIssue.completionDate) {
+            updatedIssue.completionDate = new Date(completionDate);
+          }
+          // avoid immutability of the current state
+          const newIssue = this.state.issues.concat(updatedIssue);
+          // this update the state with a new issue
+          this.setState({ issues: newIssue });
         });
-      })
-      // handles any error that occurs in the fetch apis
-      .catch(err => alert(`ERROR insending data to the server ${err.stack}`));
+      } else {
+        response.json().then(error => {
+          alert(`failed to add issue ${error.stack}`);
+        });
+      }
+    });
   }
+
+  // createIssue(newIssue) {
+  //   fetch("api/issues", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json"
+  //     },
+  //     body: JSON.stringify(newIssue)
+  //   })
+  //     .then(response => response.json()) // this is the parsed data by body parser by the json object
+  //     .then(updatedIssue => {
+  //       updatedIssue.created = new Date();
+  //       if (updatedIssue.completionDate) {
+  //         updatedIssue.completionDate = new Date(updatedIssue.completionDate);
+  //       }
+  //       // this avoids mutability of the state
+  //       const newIssues = this.state.issues.concat(updatedIssue);
+  //       this.setState({
+  //         issues: newIssues
+  //       });
+  //     })
+  //     // handles any error that occurs in the fetch apis
+  //     .catch(err => alert(`ERROR insending data to the server ${err.stack}`));
+  // }
 
   // createIssue(newIssue) {
   //   const newIssues = this.state.issues.slice(); // makes a copy of the initial array
