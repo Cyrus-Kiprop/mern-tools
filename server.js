@@ -5,20 +5,22 @@ const bodyParser = require('body-parser');
 const app = express();
 
 // mounting other middlewares into our server.js
-app.use(express.static('static'));
+app.use(express.static('dist'));
 
 // bodyparser thingy
+
 app.use(bodyParser.json());
 
-app.post('/api/issues', (req, res) => {
-    const newIssue = req.body;
-    newIssue.id = issues.length + 1;
-    newIssue.created = new Date();
-    if (!newIssue.status)
-        newIssue.status = 'New';
-    issues.push(newIssue);
-    res.json(newIssue);
-});
+// not validated post pointing to uri
+// app.post('/api/issues', (req, res) => {
+//     const newIssue = req.body;
+//     newIssue.id = issues.length + 1;
+//     newIssue.created = new Date();
+//     if (!newIssue.status)
+//         newIssue.status = 'New';
+//     issues.push(newIssue);
+//     res.json(validIssueStatus);
+// });
 
 // mock data to test the apis
 const issues = [
@@ -79,7 +81,7 @@ app.post('/api/issues', (req, res) => {
         return;
     }
     issues.push(newIssue);
-    res.json(newIssue);
+    res.json(issues);
 });
 
 app.get('/api/issues', (req, res) => {
@@ -87,6 +89,6 @@ app.get('/api/issues', (req, res) => {
     res.json({ _metadata: metadata, records: issues });
 });
 
-app.listen(3000, () => {
-    console.log('App started on port 3000');
+app.listen(3001, () => {
+    console.log('App started on port 3001');
 });
