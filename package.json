@@ -4,11 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon -w server.js server.js",
+    "start": "nodemon -w dist dist/server.js",
+    "babel": "babel server.js --out-dir dist --source-maps",
+    "babel-watch": "babel server.js --out-dir dist --source-maps --watch",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --mode production",
+    "build": "webpack",
     "build-watch": "webpack --watch",
-    "webpack-dev-server": "webpack-dev-server",
+    "webpack-dev-server": "webpack-dev-server --hot --inline",
+    "dev-all": " npm run webpack-dev-server & npm run build-watch & npm start",
     "eslint": "eslint"
   },
   "author": "",
@@ -18,13 +21,18 @@
     "express": "^4.17.0",
     "mongodb": "^3.2.6",
     "react": "16.8.6",
-    "react-dom": "16.8.6"
+    "react-dom": "16.8.6",
+    "source-map-support": "0.5.12"
   },
   "devDependencies": {
+    "@babel/cli": "7.4.4",
     "@babel/core": "7.4.5",
+    "@babel/node": "7.4.5",
     "@babel/preset-env": "7.4.5",
     "@babel/preset-react": "7.0.0",
+    "babel-cli": "6.26.0",
     "babel-loader": "8.0.6",
+    "babel-polyfill": "6.26.0",
     "cli-progress": "2.1.1",
     "eslint": "5.16.0",
     "eslint-config-airbnb": "17.1.0",
@@ -35,6 +43,9 @@
     "prop-types": "15.7.2",
     "webpack": "4.33.0",
     "webpack-cli": "3.3.2",
-    "webpack-dev-server": "3.7.1"
+    "webpack-dev-middleware": "3.7.0",
+    "webpack-dev-server": "3.7.1",
+    "webpack-hot-middleware": "2.25.0",
+    "whatwg-fetch": "3.0.0"
   }
 }
