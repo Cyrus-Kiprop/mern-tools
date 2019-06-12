@@ -1,8 +1,10 @@
-import React from 'react';
-import IssueRow from './IssueRow.jsx';
+import React from "react";
+import IssueRow from "./IssueRow.jsx";
 
 export default function IssueTable({ issues }) {
-  const issueRows = issues.map(issue => (<IssueRow key={issue.id} issue={issue} />));
+  const issueRows = issues.map(issue => (
+    <IssueRow key={issue._id} issue={issue} />
+  ));
   return (
     <table className="bordered-table">
       <thead>
@@ -18,5 +20,5 @@ export default function IssueTable({ issues }) {
       </thead>
       <tbody>{issueRows}</tbody>
     </table>
-);
+  );
 }
