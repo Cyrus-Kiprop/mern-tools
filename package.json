@@ -17,11 +17,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "whatwg-fetch": "3.0.0",
+    "prop-types": "15.7.2",
     "body-parser": "1.19.0",
     "express": "^4.17.0",
     "mongodb": "^3.2.6",
     "react": "16.8.6",
     "react-dom": "16.8.6",
+    "react-router-dom": "5.0.1",
     "source-map-support": "0.5.12"
   },
   "devDependencies": {
@@ -40,12 +43,10 @@
     "eslint-plugin-jsx-a11y": "6.2.1",
     "eslint-plugin-react": "7.13.0",
     "nodemon": "1.19.1",
-    "prop-types": "15.7.2",
     "webpack": "4.33.0",
     "webpack-cli": "3.3.2",
     "webpack-dev-middleware": "3.7.0",
     "webpack-dev-server": "3.7.1",
-    "webpack-hot-middleware": "2.25.0",
-    "whatwg-fetch": "3.0.0"
+    "webpack-hot-middleware": "2.25.0"
   }
 }

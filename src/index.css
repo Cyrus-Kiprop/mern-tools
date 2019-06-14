@@ -1,0 +1,8 @@
+nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    min-height: 10vh;
+    background: rgb(61, 68, 70);
+    color: white;
+}

@@ -1,5 +1,6 @@
 // modularizing the apps
-import React from 'react';
+import React from "react";
+import PropTypes from "prop-types";
 
 export default class IssueAdd extends React.Component {
   constructor() {
@@ -14,12 +15,12 @@ export default class IssueAdd extends React.Component {
     createIssue({
       owner: form.owner.value,
       title: form.title.value,
-      status: 'New',
+      status: "New",
       created: new Date()
     });
     // clear the form for the next input
-    form.owner.value = '';
-    form.title.value = '';
+    form.owner.value = "";
+    form.title.value = "";
   }
 
   render() {
@@ -34,4 +35,7 @@ export default class IssueAdd extends React.Component {
     );
   }
 }
-
+// createIssue prop validation for the issueAdd component
+IssueAdd.propTypes = {
+  createIssue: PropTypes.func.isRequired
+};

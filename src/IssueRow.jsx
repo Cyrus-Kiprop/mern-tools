@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 const IssueRow = ({ issue }) => {
   // let date_created = new Date(issue.created);
@@ -15,4 +16,8 @@ const IssueRow = ({ issue }) => {
     </tr>
   );
 };
+// IssueRow.propTypes = {
+//   issue: PropTypes.objectOf(PropTypes.object()).isRequired
+// };
+
 export default IssueRow;

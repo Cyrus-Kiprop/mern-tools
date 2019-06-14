@@ -1,6 +1,6 @@
 import React from "react";
 import "whatwg-fetch";
-
+// cant get rid of the jsx extentions even though eslint keeps yelling at me....sorry reviewers also am too lazy to google
 import IssueFilter from "./IssueFilter.jsx";
 import IssueTable from "./IssueTable.jsx";
 import IssueAdd from "./IssueAdd.jsx";
@@ -9,8 +9,6 @@ export default class IssueList extends React.Component {
   constructor() {
     super();
     this.state = { issues: [] };
-    // object destructuring of states
-    const { issues } = this.state;
     this.createIssue = this.createIssue.bind(this);
   }
 
@@ -51,7 +49,9 @@ export default class IssueList extends React.Component {
                 updatedIssue.completionDate
               );
             }
-            const newIssues = this.state.issues.concat(updatedIssue);
+            // this is destructuring the state object
+            const { issues } = this.state;
+            const newIssues = issues.concat(updatedIssue);
             this.setState({ issues: newIssues });
           });
         } else {
@@ -66,12 +66,13 @@ export default class IssueList extends React.Component {
   }
 
   render() {
+    const { issues } = this.state;
     return (
       <div>
         <h1>Issue Tracker</h1>
         <IssueFilter />
         <hr />
-        <IssueTable issues={this.state.issues} />
+        <IssueTable issues={issues} />
         <hr />
         <IssueAdd createIssue={this.createIssue} />
       </div>

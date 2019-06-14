@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import IssueRow from "./IssueRow.jsx";
 
 export default function IssueTable({ issues }) {
@@ -22,3 +23,6 @@ export default function IssueTable({ issues }) {
     </table>
   );
 }
+IssueTable.propTypes = {
+  issues: PropTypes.array.isRequired
+};
