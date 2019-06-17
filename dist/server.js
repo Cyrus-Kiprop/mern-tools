@@ -6,6 +6,7 @@ var _mongodb = require("mongodb");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
+// import queryString from 'query-string'
 _sourceMapSupport["default"].install();
 
 var express = require('express');
@@ -72,7 +73,7 @@ var issueFieldType = {
   created: 'required',
   completionDate: 'optional',
   title: 'required'
-};
+}; // this function validates the issue object created by the user
 
 function validateIssue(issue) {
   for (var field in issueFieldType) {
@@ -116,6 +117,8 @@ app.post('/api/issues', function (req, res) {
   });
 });
 app.get('/api/issues', function (req, res) {
+  var filter = {};
+  if (req.body.status) filter.status = req.body.status;
   db.collection('issues').find().toArray().then(function (issues) {
     var metadata = {
       total_count: issues.length

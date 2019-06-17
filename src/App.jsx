@@ -24,11 +24,12 @@ const RouteApp = () => {
     <Router>
       <div>
         <Nav />
-        {/* <Switch> */}
-        <Route path="/issues" exact strict component={IssueList} />
-        <Route path="/issues/:id" strict component={IssueEdit} />
-        <Route path="*" strict component={NoMatch} />
-        {/* </Switch> */}
+        <Redirect from="/" to="/issues" />
+        <Switch>
+          <Route path="/issues" exact component={IssueList} />
+          <Route path="/issues/:id" exact strict component={IssueEdit} />
+          <Route path="*" exact strict component={NoMatch} />
+        </Switch>
       </div>
     </Router>
   );
@@ -37,7 +38,7 @@ const RouteApp = () => {
 const contentNode = document.getElementById("contents");
 
 ReactDOM.render(<RouteApp />, contentNode);
-// this is for tracking any changes inour files so that HMR can rerender the new data to the web
+// this is for tracking any changes in our files so that HMR can rerender the new data to the web
 if (module.hot) {
   module.hot.accept();
 }

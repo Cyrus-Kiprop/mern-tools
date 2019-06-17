@@ -1,12 +1,15 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 
-const IssueRow = ({ issue }) => {
+const IssueRow = ({ issue, match }) => {
   // let date_created = new Date(issue.created);
 
   return (
     <tr>
-      <td>{issue._id}</td>
+      <td>
+        <Link to={`/issues/${issue._id}`}>{issue._id.substr(-4)}</Link>
+      </td>
       <td>{issue.status}</td>
       <td>{issue.owner}</td>
       <td>{issue.created.toDateString()}</td>

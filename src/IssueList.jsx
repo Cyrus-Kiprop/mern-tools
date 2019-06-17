@@ -1,26 +1,45 @@
 import React from "react";
 import "whatwg-fetch";
-// cant get rid of the jsx extentions even though eslint keeps yelling at me....sorry reviewers also am too lazy to google
+import queryString from "query-string";
+// cant get rid of the jsx extentions even though eslint keeps yelling at me....sorry reviewers am also too lazy to google
 import IssueFilter from "./IssueFilter.jsx";
 import IssueTable from "./IssueTable.jsx";
 import IssueAdd from "./IssueAdd.jsx";
 
 export default class IssueList extends React.Component {
-  constructor() {
-    super();
+  // _isMounted = false;
+  constructor(props) {
+    super(props);
     this.state = { issues: [] };
     this.createIssue = this.createIssue.bind(this);
   }
-
-  componentDidMount() {
+  // React Lifecycle methods
+  componentDidUpdate(prevProps) {
+    // the query strings have to be passed using query strings
+    // const oldQuery = prevProps.location.query;
+    // const parsed_oldQuery = queryString.parse(oldQuery);
+    // console.log(parsed_oldQuery.status);
+    // const newQuery = this.props.location.query;
+    // const parsed_newQuery = queryString.parse(newQuery);
+    // console.log(parsed_newQuery.status);
+    // if (parsed_oldQuery.status === parsed_newQuery.status) {
+    //   return;
+    // }
     this.loadData();
+    // this._isMounted = true;
+    // if (this._isMounted) {
+    //   this.loadData();
+    // }
   }
+  // componentWillUnmount() {
+  //   this._isMounted = false;
+  // }
 
   loadData() {
     fetch("/api/issues")
       .then(response => response.json())
       .then(data => {
-        console.log("Total count of records:", data._metadata.total_count);
+        // console.log("Total count of records:", data._metadata.total_count);
         data.records.forEach(issue => {
           issue.created = new Date(issue.created);
           if (issue.completionDate) {
