@@ -16,8 +16,21 @@ var bodyParser = require('body-parser'); // an instance of express
 
 var app = express(); // mounting other middlewares into our server.js
 
-app.use(express["static"]('static')); // connection to the database
-// hot module replacement using HMR  express middlewares
+app.use(express["static"]('static'));
+
+var qpm = require('query-params-mongo');
+
+var mongodb = require('mongodb');
+
+var processQuery = qpm({
+  autoDetect: [{
+    fieldPattern: /_id$/,
+    dataType: 'objectId'
+  }],
+  converters: {
+    objectId: mongodb.ObjectID
+  }
+}); // hot module replacement using HMR  express middlewares
 // if (process.env.NODE_ENV !== 'production') {
 //     const webpack = require('webpack');
 //     const webpackDevMiddleware = require('webpack-dev-middleware');
@@ -117,22 +130,50 @@ app.post('/api/issues', function (req, res) {
   });
 });
 app.get('/api/issues', function (req, res) {
+  // try {
+  //     var query = processQuery(req.query.status,
+  //         { name: { dataType: 'string', required: false } },
+  //         true
+  //     );
+  // } catch (errors) {
+  //     res.status(500).send(errors);
+  // }
+  // console.log(query);
   var filter = {};
-  if (req.body.status) filter.status = req.body.status;
-  db.collection('issues').find().toArray().then(function (issues) {
-    var metadata = {
-      total_count: issues.length
-    };
-    res.json({
-      _metadata: metadata,
-      records: issues
+  filter.status = req.query.status; // this is a conditional statement that checks for undefined query strings
+
+  if (filter.status !== undefined) {
+    db.collection('issues').find(filter).toArray().then(function (issues) {
+      var metadata = {
+        total_count: issues.length
+      };
+      console.log(filter);
+      res.json({
+        _metadata: metadata,
+        records: issues
+      });
+    })["catch"](function (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Internal Server Error: ".concat(error)
+      });
     });
-  })["catch"](function (error) {
-    console.log(error);
-    res.status(500).json({
-      message: "Internal Server Error: ".concat(error)
+  } else {
+    db.collection('issues').find().toArray().then(function (issues) {
+      var metadata = {
+        total_count: issues.length
+      };
+      res.json({
+        _metadata: metadata,
+        records: issues
+      });
+    })["catch"](function (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Internal Server Error: ".concat(error)
+      });
     });
-  });
+  }
 });
 var db = null; // Initialize connection once
 

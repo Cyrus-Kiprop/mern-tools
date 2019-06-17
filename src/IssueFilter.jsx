@@ -7,9 +7,9 @@ const IssueFilter = () => {
     <div>
       <Link to="/issues">All Issues</Link>
       <Separator />
-      <Link to={{ pathname: "/issues", query: { status: "Open" } }}>
-        Open Issues
-      </Link>
+      <Link to="/issues?status=Open">Open Issues</Link>
+      <Separator />
+      <Link to="/issues?status=New">New Issues</Link>
       <Separator />
       <Link to="/issues?status=Assigned">Assigned Issues</Link>
     </div>

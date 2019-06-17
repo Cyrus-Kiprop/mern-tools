@@ -26,17 +26,13 @@ export default class IssueList extends React.Component {
     //   return;
     // }
     this.loadData();
-    // this._isMounted = true;
-    // if (this._isMounted) {
-    //   this.loadData();
-    // }
   }
   // componentWillUnmount() {
   //   this._isMounted = false;
   // }
 
   loadData() {
-    fetch("/api/issues")
+    fetch(`/api/issues${this.props.location.search}`)
       .then(response => response.json())
       .then(data => {
         // console.log("Total count of records:", data._metadata.total_count);

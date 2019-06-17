@@ -14,7 +14,14 @@ const app = express();
 // mounting other middlewares into our server.js
 app.use(express.static('static'));
 
-// connection to the database
+
+var qpm = require('query-params-mongo');
+var mongodb = require('mongodb');
+
+var processQuery = qpm({
+    autoDetect: [{ fieldPattern: /_id$/, dataType: 'objectId' }],
+    converters: { objectId: mongodb.ObjectID }
+});
 
 
 
@@ -121,15 +128,36 @@ app.post('/api/issues', (req, res) => {
 });
 
 app.get('/api/issues', (req, res) => {
+    // try {
+    //     var query = processQuery(req.query.status,
+    //         { name: { dataType: 'string', required: false } },
+    //         true
+    //     );
+    // } catch (errors) {
+    //     res.status(500).send(errors);
+    // }
+    // console.log(query);
     const filter = {};
-    if (req.body.status) filter.status = req.body.status;
-    db.collection('issues').find().toArray().then(issues => {
-        const metadata = { total_count: issues.length };
-        res.json({ _metadata: metadata, records: issues })
-    }).catch(error => {
-        console.log(error);
-        res.status(500).json({ message: `Internal Server Error: ${error}` });
-    });
+    filter.status = req.query.status;
+    // this is a conditional statement that checks for undefined query strings
+    if (filter.status !== undefined) {
+        db.collection('issues').find(filter).toArray().then(issues => {
+            const metadata = { total_count: issues.length };
+            console.log(filter);
+            res.json({ _metadata: metadata, records: issues })
+        }).catch(error => {
+            console.log(error);
+            res.status(500).json({ message: `Internal Server Error: ${error}` });
+        });
+    } else {
+        db.collection('issues').find().toArray().then(issues => {
+            const metadata = { total_count: issues.length };
+            res.json({ _metadata: metadata, records: issues })
+        }).catch(error => {
+            console.log(error);
+            res.status(500).json({ message: `Internal Server Error: ${error}` });
+        });
+    }
 });
 
 let db = null;
