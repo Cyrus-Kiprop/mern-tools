@@ -1,11 +1,12 @@
-import React from "react";
-import "whatwg-fetch";
-import queryString from "query-string";
+import React from 'react';
+import 'whatwg-fetch';
+import queryString from 'query-string';
+import PropTypes from 'prop-types';
+
 // cant get rid of the jsx extentions even though eslint keeps yelling at me....sorry reviewers am also too lazy to google
-import IssueFilter from "./IssueFilter.jsx";
-import IssueTable from "./IssueTable.jsx";
-import IssueAdd from "./IssueAdd.jsx";
-import PropTypes from "prop-types";
+import IssueFilter from './IssueFilter.jsx';
+import IssueTable from './IssueTable.jsx';
+import IssueAdd from './IssueAdd.jsx';
 
 export default class IssueList extends React.Component {
   // _isMounted = false;
@@ -14,12 +15,12 @@ export default class IssueList extends React.Component {
     this.state = { issues: [] };
     console.log(props);
     console.log(this.props.location.pathname);
-    console.log(this.props.location.url)
+    console.log(this.props.location.url);
     // binding methods created in the class component
     this.createIssue = this.createIssue.bind(this);
     this.setFilter = this.setFilter.bind(this);
   }
-  
+
   // React Lifecycle methods
   componentDidUpdate(prevProps) {
     if (this.props.location !== prevProps.location) {
@@ -28,10 +29,10 @@ export default class IssueList extends React.Component {
   }
 
   setFilter(query) {
-    const data_query =queryString.stringify(query);
+    // very important to stringify the data
+    const data_query = queryString.stringify(query);
 
     this.props.history.replace(`${this.props.location.pathname}?${data_query}`);
-    
   }
 
   loadData() {
@@ -53,9 +54,9 @@ export default class IssueList extends React.Component {
   }
 
   createIssue(newIssue) {
-    fetch("/api/issues", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    fetch('/api/issues', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newIssue)
     })
       .then(response => {
@@ -87,7 +88,6 @@ export default class IssueList extends React.Component {
     const { issues } = this.state;
     return (
       <div>
-        <h1>Issue Tracker</h1>
         <IssueFilter setFilter={this.setFilter} />
         <hr />
         <IssueTable issues={issues} />
@@ -100,5 +100,5 @@ export default class IssueList extends React.Component {
 // prop validations
 IssueList.propTypes = {
   location: PropTypes.object.isRequired,
-  router: PropTypes.object
+  history: PropTypes.object.isRequired
 };

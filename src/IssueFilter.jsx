@@ -5,7 +5,9 @@ import {Link} from 'react-router-dom';
 class IssueFilter extends React.Component {
   constructor(props) {
     super(props);
-
+this.state ={
+  bgcolor: ''
+}
     // Binding the handler functions to access the this instance
     this.setFilterOpen = this.setFilterOpen.bind(this);
     this.setFilterNew = this.setFilterNew.bind(this);
@@ -26,7 +28,12 @@ class IssueFilter extends React.Component {
     e.preventDefault();
     this.props.setFilter({ status: "New" });
   }
-
+  // this handles colorto green  change when the user clicks on the links
+changeColor(){
+  this.setState({
+    bgcolor: 'green'
+  });
+}
 
   render() {
     const Separator = () => <span> | </span>;
@@ -35,7 +42,7 @@ class IssueFilter extends React.Component {
       <div>
         <Link to="/issues">All Issues</Link>
         <Separator />
-        <a href="#" onClick={this.setFilterOpen}>
+        <a href="#"  onClick={this.setFilterOpen}>
           Open Issues
         </a>
         <Separator />
