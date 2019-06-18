@@ -25,7 +25,9 @@ export default class IssueList extends React.Component {
     // if (parsed_oldQuery.status === parsed_newQuery.status) {
     //   return;
     // }
-    this.loadData();
+    if (this.props.location !== prevProps.location) {
+      this.loadData();
+    }
   }
   // componentWillUnmount() {
   //   this._isMounted = false;
@@ -94,3 +96,7 @@ export default class IssueList extends React.Component {
     );
   }
 }
+// prop validations
+IssueList.propTypes = {
+  location: PropTypes.object.isRequired
+};

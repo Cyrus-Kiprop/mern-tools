@@ -5,6 +5,7 @@ import {
   Route,
   Switch,
   Redirect,
+  withRouter,
   Link
 } from "react-router-dom";
 // importing the modularized files from other directories
