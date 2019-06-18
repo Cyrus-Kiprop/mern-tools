@@ -140,7 +140,7 @@ app.get('/api/issues', function (req, res) {
   // }
   // console.log(query);
   var filter = {};
-  filter.status = req.query.status; // this is a conditional statement that checks for undefined query strings
+  filter.status = req.query.status; // this is a conditional statement that checks for undefined query
 
   if (filter.status !== undefined) {
     db.collection('issues').find(filter).toArray().then(function (issues) {

@@ -5,33 +5,34 @@ import queryString from "query-string";
 import IssueFilter from "./IssueFilter.jsx";
 import IssueTable from "./IssueTable.jsx";
 import IssueAdd from "./IssueAdd.jsx";
+import PropTypes from "prop-types";
 
 export default class IssueList extends React.Component {
   // _isMounted = false;
   constructor(props) {
     super(props);
     this.state = { issues: [] };
+    console.log(props);
+    console.log(this.props.location.pathname);
+    console.log(this.props.location.url)
+    // binding methods created in the class component
     this.createIssue = this.createIssue.bind(this);
+    this.setFilter = this.setFilter.bind(this);
   }
+  
   // React Lifecycle methods
   componentDidUpdate(prevProps) {
-    // the query strings have to be passed using query strings
-    // const oldQuery = prevProps.location.query;
-    // const parsed_oldQuery = queryString.parse(oldQuery);
-    // console.log(parsed_oldQuery.status);
-    // const newQuery = this.props.location.query;
-    // const parsed_newQuery = queryString.parse(newQuery);
-    // console.log(parsed_newQuery.status);
-    // if (parsed_oldQuery.status === parsed_newQuery.status) {
-    //   return;
-    // }
     if (this.props.location !== prevProps.location) {
       this.loadData();
     }
   }
-  // componentWillUnmount() {
-  //   this._isMounted = false;
-  // }
+
+  setFilter(query) {
+    const data_query =queryString.stringify(query);
+
+    this.props.history.replace(`${this.props.location.pathname}?${data_query}`);
+    
+  }
 
   loadData() {
     fetch(`/api/issues${this.props.location.search}`)
@@ -87,7 +88,7 @@ export default class IssueList extends React.Component {
     return (
       <div>
         <h1>Issue Tracker</h1>
-        <IssueFilter />
+        <IssueFilter setFilter={this.setFilter} />
         <hr />
         <IssueTable issues={issues} />
         <hr />
@@ -98,5 +99,6 @@ export default class IssueList extends React.Component {
 }
 // prop validations
 IssueList.propTypes = {
-  location: PropTypes.object.isRequired
+  location: PropTypes.object.isRequired,
+  router: PropTypes.object
 };

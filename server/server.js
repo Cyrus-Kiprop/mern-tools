@@ -139,7 +139,7 @@ app.get('/api/issues', (req, res) => {
     // console.log(query);
     const filter = {};
     filter.status = req.query.status;
-    // this is a conditional statement that checks for undefined query strings
+    // this is a conditional statement that checks for undefined query
     if (filter.status !== undefined) {
         db.collection('issues').find(filter).toArray().then(issues => {
             const metadata = { total_count: issues.length };

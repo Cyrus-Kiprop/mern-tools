@@ -27,7 +27,8 @@ const RouteApp = () => {
         <Nav />
         <Redirect from="/" to="/issues" />
         <Switch>
-          <Route path="/issues" exact component={IssueList} />
+          {/* injecting a router to issuefilter with the withROuter methods */}
+          <Route path="/issues" exact component={withRouter(IssueList)} />
           <Route path="/issues/:id" exact strict component={IssueEdit} />
           <Route path="*" exact strict component={NoMatch} />
         </Switch>
