@@ -32,7 +32,7 @@ export default class IssueList extends React.Component {
     // very important to stringify the data
     const data_query = queryString.stringify(query);
 
-    this.props.history.replace(`${this.props.location.pathname}?${data_query}`);
+    this.props.history.push(`${this.props.location.pathname}?${data_query}`);
   }
 
   loadData() {

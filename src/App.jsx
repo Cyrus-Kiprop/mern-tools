@@ -26,6 +26,7 @@ const App = ({ children }) => (
     </div>
     <div className="contents">{children}</div>
     <div className="footer">
+      Full source code available at this
       <a href="https://github.com/vasansr/pro-mern-stack">GitHub repository</a>
 .
     </div>
