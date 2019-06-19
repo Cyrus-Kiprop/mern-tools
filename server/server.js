@@ -128,19 +128,17 @@ app.post('/api/issues', (req, res) => {
 });
 
 app.get('/api/issues', (req, res) => {
-    // try {
-    //     var query = processQuery(req.query.status,
-    //         { name: { dataType: 'string', required: false } },
-    //         true
-    //     );
-    // } catch (errors) {
-    //     res.status(500).send(errors);
-    // }
-    // console.log(query);
+
     const filter = {};
-    filter.status = req.query.status;
+    if (req.query.status) filter.status = req.query.status;
+
+    // filtering using the effort field
+    if (req.query.effort_gte || req.query.effort_lte) filter.effort = {};
+    if (req.query.effort_gte) filter.effort.$gte = parseInt(req.query.effort_gte, 10);
+    if (req.query.effort_lte) filter.effort.$lte = parseInt(req.query.effort_lte, 10);
+    console.log(filter)
     // this is a conditional statement that checks for undefined query
-    if (filter.status !== undefined) {
+    if (filter !== undefined) {
         db.collection('issues').find(filter).toArray().then(issues => {
             const metadata = { total_count: issues.length };
             console.log(filter);

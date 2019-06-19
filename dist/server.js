@@ -130,19 +130,15 @@ app.post('/api/issues', function (req, res) {
   });
 });
 app.get('/api/issues', function (req, res) {
-  // try {
-  //     var query = processQuery(req.query.status,
-  //         { name: { dataType: 'string', required: false } },
-  //         true
-  //     );
-  // } catch (errors) {
-  //     res.status(500).send(errors);
-  // }
-  // console.log(query);
   var filter = {};
-  filter.status = req.query.status; // this is a conditional statement that checks for undefined query
+  if (req.query.status) filter.status = req.query.status; // filtering using the effort field
 
-  if (filter.status !== undefined) {
+  if (req.query.effort_gte || req.query.effort_lte) filter.effort = {};
+  if (req.query.effort_gte) filter.effort.$gte = parseInt(req.query.effort_gte, 10);
+  if (req.query.effort_lte) filter.effort.$lte = parseInt(req.query.effort_lte, 10);
+  console.log(filter); // this is a conditional statement that checks for undefined query
+
+  if (filter !== undefined) {
     db.collection('issues').find(filter).toArray().then(function (issues) {
       var metadata = {
         total_count: issues.length

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import 'whatwg-fetch';
 import queryString from 'query-string';
 import PropTypes from 'prop-types';
@@ -8,14 +8,14 @@ import IssueFilter from './IssueFilter.jsx';
 import IssueTable from './IssueTable.jsx';
 import IssueAdd from './IssueAdd.jsx';
 
-export default class IssueList extends React.Component {
+export default class IssueList extends Component {
   // _isMounted = false;
   constructor(props) {
     super(props);
     this.state = { issues: [] };
     console.log(props);
-    console.log(this.props.location.pathname);
-    console.log(this.props.location.url);
+    // console.log(this.props.location.pathname);
+    // console.log(this.props.location.url);
     // binding methods created in the class component
     this.createIssue = this.createIssue.bind(this);
     this.setFilter = this.setFilter.bind(this);
@@ -88,7 +88,10 @@ export default class IssueList extends React.Component {
     const { issues } = this.state;
     return (
       <div>
-        <IssueFilter setFilter={this.setFilter} />
+        <IssueFilter
+          initFilter={this.props.location}
+          setFilter={this.setFilter}
+        />
         <hr />
         <IssueTable issues={issues} />
         <hr />
