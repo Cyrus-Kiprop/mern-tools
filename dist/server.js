@@ -7,6 +7,8 @@ var _mongodb = require("mongodb");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 // import queryString from 'query-string'
+var ObjectId = require('mongodb').ObjectID;
+
 _sourceMapSupport["default"].install();
 
 var express = require('express');
@@ -170,6 +172,32 @@ app.get('/api/issues', function (req, res) {
       });
     });
   }
+}); // the get api
+
+app.get('/api/issues/:id', function (req, res) {
+  var issueId;
+
+  try {
+    issueId = new ObjectId(req.params.id);
+  } catch (error) {
+    res.status(422).json({
+      message: "Invalid issue ID format: ".concat(error)
+    });
+    return;
+  }
+
+  db.collection('issues').find({
+    _id: issueId
+  }).limit(1).next().then(function (issue) {
+    if (!issue) res.status(404).json({
+      message: "No such issue: ".concat(issueId)
+    });else res.json(issue);
+  })["catch"](function (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Internal Server Error: ".concat(error)
+    });
+  });
 });
 var db = null; // Initialize connection once
 

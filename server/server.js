@@ -2,6 +2,8 @@ import sourceMapSupport from 'source-map-support'
 // import queryString from 'query-string'
 import { MongoClient } from 'mongodb';
 
+var ObjectId = require('mongodb').ObjectID;
+
 
 sourceMapSupport.install()
 
@@ -156,6 +158,27 @@ app.get('/api/issues', (req, res) => {
             res.status(500).json({ message: `Internal Server Error: ${error}` });
         });
     }
+});
+
+// the get api
+app.get('/api/issues/:id', (req, res) => {
+    let issueId;
+    try {
+        issueId = new ObjectId(req.params.id);
+    } catch (error) {
+        res.status(422).json({ message: `Invalid issue ID format: ${error}` });
+        return;
+    }
+    db.collection('issues').find({ _id: issueId }).limit(1)
+        .next()
+        .then(issue => {
+            if (!issue) res.status(404).json({ message: `No such issue: ${issueId}` });
+            else res.json(issue);
+        })
+        .catch(error => {
+            console.log(error);
+            res.status(500).json({ message: `Internal Server Error: ${error}` });
+        });
 });
 
 let db = null;

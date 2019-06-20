@@ -41,6 +41,7 @@ const RouteApp = () => {
     <Router>
       <div>
         <Redirect from="/" to="/issues" />
+        <Nav />
         <Switch>
           <App>
             {/* injecting a router to issuefilter with the withROuter methods */}
