@@ -198,6 +198,42 @@ app.get('/api/issues/:id', function (req, res) {
       message: "Internal Server Error: ".concat(error)
     });
   });
+}); // the update api
+
+app.put('api/issues/:id', function (req, res) {
+  var issueId;
+
+  try {
+    issueId = new ObjectId(req.match.params.id);
+  } catch (error) {
+    res.status(422).send("this is an invalid id ".concat(error));
+  }
+
+  var issue = req.body;
+  delete issue.id;
+  var err = Issue.validateIssue(issue);
+
+  if (err) {
+    res.status(422).json({
+      message: "Invalid request: ".concat(err)
+    });
+    return;
+  }
+
+  db.collection('issues').update({
+    _id: issueId
+  }, Issue.convertIssue(issue)).then(function () {
+    return db.collection('issues').find({
+      _id: issueId
+    }).limit(1).next();
+  }).then(function (savedIssue) {
+    res.json(savedIssue);
+  })["catch"](function (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Internal Server Error: ".concat(error)
+    });
+  });
 });
 var db = null; // Initialize connection once
 
