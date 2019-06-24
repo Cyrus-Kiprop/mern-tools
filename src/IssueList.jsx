@@ -19,6 +19,7 @@ export default class IssueList extends Component {
     // binding methods created in the class component
     this.createIssue = this.createIssue.bind(this);
     this.setFilter = this.setFilter.bind(this);
+    this.deleteIssue = this.deleteIssue.bind(this);
   }
 
   // React Lifecycle methods
@@ -33,6 +34,13 @@ export default class IssueList extends Component {
     const data_query = queryString.stringify(query);
 
     this.props.history.push(`${this.props.location.pathname}?${data_query}`);
+  }
+  //  THE CLIENT SIDE DELETE API
+  deleteIssue(id) {
+    fetch(`/api/issues/${id}`, { method: 'DELETE' }).then(response => {
+      if (!response.ok) alert('Failed to delete issue');
+      else this.loadData();
+    });
   }
 
   loadData() {
@@ -93,7 +101,7 @@ export default class IssueList extends Component {
           setFilter={this.setFilter}
         />
         <hr />
-        <IssueTable issues={issues} />
+        <IssueTable issues={issues} deleteIssue={this.deleteIssue} />
         <hr />
         <IssueAdd createIssue={this.createIssue} />
       </div>

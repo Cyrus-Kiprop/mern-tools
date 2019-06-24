@@ -2,8 +2,10 @@ import sourceMapSupport from 'source-map-support'
 // import queryString from 'query-string'
 import { MongoClient } from 'mongodb';
 
-var ObjectId = require('mongodb').ObjectID;
+import { validateIssue, cleanupIssue, convertIssue } from "./Issue.js";
+import Issue from './issue.js';
 
+const ObjectId = require('mongodb').ObjectID;
 
 sourceMapSupport.install()
 
@@ -78,37 +80,40 @@ app.use(bodyParser.json());
 //     },
 // ];
 
-const validIssueStatus = {
-    New: true,
-    Open: true,
-    Assigned: true,
-    Fixed: true,
-    Verified: true,
-    Closed: true,
-};
-const issueFieldType = {
-    status: 'required',
-    owner: 'required',
-    effort: 'optional',
-    created: 'required',
-    completionDate: 'optional',
-    title: 'required',
-};
-// this function validates the issue object created by the user
-function validateIssue(issue) {
-    for (const field in issueFieldType) {
-        const type = issueFieldType[field];
-        if (!type) {
-            delete issue[field];
-        } else if (type === 'required' && !issue[field]) {
-            return `${field} is required.`;
-        }
-    }
-    if (!validIssueStatus[issue.status])
-        return `${issue.status} is not a valid status.`;
-    return null;
-}
+//VALIDATIONS HAVE BEEN SHIFTED TO A NEW FILES CALLED ISSUES.JS
 
+// const validIssueStatus = {
+//     New: true,
+//     Open: true,
+//     Assigned: true,
+//     Fixed: true,
+//     Verified: true,
+//     Closed: true,
+// };
+// const issueFieldType = {
+//     status: 'required',
+//     owner: 'required',
+//     effort: 'optional',
+//     created: 'required',
+//     completionDate: 'optional',
+//     title: 'required',
+// };
+// // this function validates the issue object created by the user
+// function validateIssue(issue) {
+//     for (const field in issueFieldType) {
+//         const type = issueFieldType[field];
+//         if (!type) {
+//             delete issue[field];
+//         } else if (type === 'required' && !issue[field]) {
+//             return `${field} is required.`;
+//         }
+//     }
+//     if (!validIssueStatus[issue.status])
+//         return `${issue.status} is not a valid status.`;
+//     return null;
+// }
+
+// THIS ARE THE RESTFUL CRUD APIS AVAILABLE FOR THE SITE
 app.post('/api/issues', (req, res) => {
     const newIssue = req.body;
     newIssue.created = new Date();
@@ -182,33 +187,52 @@ app.get('/api/issues/:id', (req, res) => {
 });
 
 // the update api
-app.put('api/issues/:id', (req, res) => {
-    let issueId;
+app.put(`/api/issues/:id`, (req, res) => {
+    let issue_id;
     try {
-
-        issueId = new ObjectId(req.match.params.id)
+        issue_id = new Object(req.match.params.id)
     } catch (error) {
-        res.status(422).send(`this is an invalid id ${error}`)
+        console.log(error.stack);
+        res.status(422).json({ message: `Invalid issue ID format: ${error}` });
     }
     const issue = req.body;
-    delete issue.id;
+    // get rid of the object_id in the database so that the new updated oibject can be updated with a new
+    delete issue._id;
+    // VALIDATE THE REQ.BODY RECIEVED FROM THE USER
+    // I CANT SEM TO UNDERSTAND ISSUES WHERE IT COEMS FROM
     const err = Issue.validateIssue(issue);
-    if (err) {
-        res.status(422).json({ message: `Invalid request: ${err}` });
-        return;
+    if (error) {
+        res.status(42).json({ message: `invalid request ${error}`);
     }
-    db.collection('issues').update({ _id: issueId },
-        Issue.convertIssue(issue)).then(() =>
-            db.collection('issues').find({ _id: issueId }).limit(1)
-                .next()
-        )
-        .then(savedIssue => {
-            res.json(savedIssue);
+    db.collection(issues).update({ _id: issue_id }, Issue.convertIssue(issue)).then(() => {
+        db.collection(issues).find({ _id: issue_id }).limit(1), next().then((savedIssue) => {
+            res.json(savedIssue).catch((error).)
         })
-        .catch(error => {
-            console.log(error);
-            res.status(500).json({ message: `Internal Server Error: ${error}` });
-        });
+    }).catch((error) => {
+        res.status(422).json({ message: `Invalid request ${error}` })
+    })
+}
+)
+
+// the server side delete api
+app.delete(`/api/issues/:id`, (req, res) => {
+    let issue_id;
+    try {
+        issue_id = new ObjectId(this.props.issue_id);
+    } catch (error) {
+        res.status(422).json({ message: `Invalid issue ID format: ${error}` });
+    }
+
+    db.collection('issues').deleteOne({ _id: issue_id }).then((deleted_results) => {
+        if (deleted_results.results.n === 1) {
+            res.json({ status: 'OK' })
+        } else {
+            res.json({ status: 'the issue object was not found' });
+        }
+    }).catch((error) => {
+        console.log(error.stack);
+        res.status(500).json({ message: `the target object id was not found in the database` })
+    })
 });
 
 let db = null;

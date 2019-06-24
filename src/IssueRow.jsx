@@ -1,9 +1,12 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
-const IssueRow = ({ issue, match }) => {
+const IssueRow = ({ issue, match, deleteIssue }) => {
   // let date_created = new Date(issue.created);
+  const onDeleteClick = () => {
+    deleteIssue(issue._id);
+  };
 
   return (
     <tr>
@@ -14,13 +17,17 @@ const IssueRow = ({ issue, match }) => {
       <td>{issue.owner}</td>
       <td>{issue.created.toDateString()}</td>
       <td>{issue.effort}</td>
-      <td>{issue.completionDate ? issue.completionDate.toDateString() : ""}</td>
+      <td>{issue.completionDate ? issue.completionDate.toDateString() : ''}</td>
       <td>{issue.title}</td>
+      <td>
+        <button onClick={onDeleteClick}>Delete</button>
+      </td>
     </tr>
   );
 };
 // IssueRow.propTypes = {
-//   issue: PropTypes.objectOf(PropTypes.object()).isRequired
+//   issue: PropTypes.objectOf(PropTypes.object()).isRequired,
+//
 // };
 
 export default IssueRow;

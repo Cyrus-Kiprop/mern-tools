@@ -24,6 +24,7 @@ export default class IssueEdit extends Component {
     };
     // binding
     this.onChange = this.onChange.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
     this.onValidityChange = this.onValidityChange.bind(this);
   }
   // life Cycle Control
@@ -44,6 +45,41 @@ export default class IssueEdit extends Component {
       delete invalidFields[event.target.name];
     }
     this.setState({ invalidFields });
+  }
+
+  onSubmit(event) {
+    event.preventDefault();
+    if (Object.keys(this.state.invalidFields).length !== 0) {
+      return;
+    }
+    fetch(`/api/issues/${this.props.match.params.id}, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(this.state.issue),
+    }`).then((response)=>{
+      if (response.ok) {
+        response.json().then((updatedIssue)=>{
+          // VALIDATING ISSEU FIELDS TO NATURAL DATE OBJECTS
+            updatedIssue.created= new Date(updatedIssue.created);
+            if (updateIssue.completionDate) {
+              updateIssue.completionDate= new Date(updateIssue.completionDate);
+            }
+            this.setState({
+              issue: updatedIssue
+            })
+            alert( `updated Issue successfully`);
+          })
+          
+
+        }else {
+          response.json().then(error => {
+            alert(`Failed to update issue: ${error.message}`);
+          });
+        }
+      }).catch((error)=>{
+          alert(`Error in sending data to server: ${error.message}`);
+        })
+  
   }
 
   onChange(event, convertedValue) {
@@ -97,14 +133,14 @@ export default class IssueEdit extends Component {
       );
     return (
       <div>
-        <form>
+        <form onSubmit = {this.onSubmit}>
           ID: 
           {' '}
           {issue._id}
           <br />
           Created: 
           {' '}
-          {issue.created}
+          {issue.created ? issue.created.toDateString() : '' }
           <br />
           Status:
           {' '}

@@ -69,6 +69,7 @@ class IssueFilter extends React.Component {
       });
     }
   }
+
   onChangeEffortLte(e) {
     let range = e.target.value;
     if (range.match(/^\d*$/gm)) {
@@ -100,6 +101,7 @@ class IssueFilter extends React.Component {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
+    if(this.props)
     this.setState({
       status: nextProps.status || '',
       effort_gte: nextProps.effort_gte || '',

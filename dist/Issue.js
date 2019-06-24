@@ -4,6 +4,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+// modularised the server files for easy reuse and usability
+// this specically  hamdles the validation procedires of the server side 
 var validIssueStatus = {
   New: true,
   Open: true,
@@ -48,7 +50,8 @@ function validateIssue(issue) {
   }
 
   return errors.length ? errors.join('; ') : null;
-}
+} // EXPROTING THE UTILITY FUNCTIONS 
+
 
 var _default = {
   validateIssue: validateIssue,

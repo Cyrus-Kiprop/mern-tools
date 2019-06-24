@@ -1,10 +1,10 @@
-import React from "react";
-import PropTypes from "prop-types";
-import IssueRow from "./IssueRow.jsx";
+import React from 'react';
+import PropTypes from 'prop-types';
+import IssueRow from './IssueRow.jsx';
 
-export default function IssueTable({ issues }) {
+export default function IssueTable({ issues, deleteIssue }) {
   const issueRows = issues.map(issue => (
-    <IssueRow key={issue._id} issue={issue} />
+    <IssueRow key={issue._id} issue={issue} deleteIssue={deleteIssue} />
   ));
   return (
     <table className="bordered-table">
@@ -17,6 +17,7 @@ export default function IssueTable({ issues }) {
           <th>Effort</th>
           <th>Completion Date</th>
           <th>Title</th>
+          <th />
         </tr>
       </thead>
       <tbody>{issueRows}</tbody>
@@ -24,5 +25,6 @@ export default function IssueTable({ issues }) {
   );
 }
 IssueTable.propTypes = {
-  issues: PropTypes.array.isRequired
+  issues: PropTypes.array.isRequired,
+  deleteIssue: PropTypes.func
 };
